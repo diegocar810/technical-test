@@ -18,7 +18,7 @@ This API allows managing franchises, branches, and products. You can create fran
 
 ### Prerequisites
 
-- JDK 17 or higher
+- JDK 23 or higher
 - MongoDB installed and running at `localhost:27017`
 
 ### MongoDB Configuration
