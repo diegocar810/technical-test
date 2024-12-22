@@ -9,9 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 
 @Service
@@ -83,7 +82,6 @@ public class FranchiseService {
         return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
     }
 
-
     public ResponseEntity<Object> deleteProductToBranch(String franchiseId, String branchId, String productId) {
 
         Optional<Franchise> franchiseOptional = franchiseRepository.findById(franchiseId);
@@ -149,4 +147,36 @@ public class FranchiseService {
 
         return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
     }
+
+    public ResponseEntity<Object> topProductStock(String franchiseId) {
+
+        Optional<Franchise> franchiseOptional = franchiseRepository.findById(franchiseId);
+        if (franchiseOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Franchise franchise = franchiseOptional.get();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for (Branch branch : franchise.getBranches()) {
+            Product topProduct = branch.getProducts().stream()
+                    .max(Comparator.comparingInt(Product::getStock))
+                    .orElse(null);
+
+            if (topProduct != null) {
+                Map<String, Object> branchProductInfo = new HashMap<>();
+                branchProductInfo.put("branchId", branch.getId());
+                branchProductInfo.put("branchName", branch.getName());
+                branchProductInfo.put("productId", topProduct.getId());
+                branchProductInfo.put("productName", topProduct.getName());
+                branchProductInfo.put("stock", topProduct.getStock());
+                result.add(branchProductInfo);
+            }
+        }
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
+    }
+
 }

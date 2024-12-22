@@ -45,7 +45,11 @@ public class FranchiseController {
     @PutMapping("/{franchiseId}/branches/{branchId}/products/{productId}/stock")
     public ResponseEntity<Object> updateProductStock(@PathVariable String franchiseId, @PathVariable String branchId, @PathVariable String productId, @RequestBody Map<String, Integer> stockUpdate) {
         return franchiseService.updateStok(franchiseId, branchId, productId, stockUpdate);
+    }
 
+    @GetMapping("/{franchiseId}/branches/topproducts")
+    public ResponseEntity<Object> topProductStock(@PathVariable String franchiseId) {
+        return franchiseService.topProductStock(franchiseId);
     }
 
 }
