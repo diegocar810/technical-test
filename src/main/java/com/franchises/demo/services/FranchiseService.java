@@ -43,8 +43,8 @@ public class FranchiseService {
         return franchiseRepository.save(franchise);
     }
 
-    public ResponseEntity<Object> addBranchsToFranchise (String franchiseId, Branch newBranch) {
-        
+    public ResponseEntity<Object> addBranchsToFranchise(String franchiseId, Branch newBranch) {
+
         Optional<Franchise> franchiseOptional = franchiseRepository.findById(franchiseId);
         if (franchiseOptional.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -54,6 +54,60 @@ public class FranchiseService {
         franchise.getBranches().add(newBranch);
         Franchise updatedFranchise = franchiseRepository.save(franchise);
 
-        return  new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
+        return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> addProductToBranch(String franchiseId, String branchId, Product newProduct) {
+
+        Optional<Franchise> franchiseOptional = franchiseRepository.findById(franchiseId);
+        if (franchiseOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Franchise franchise = franchiseOptional.get();
+
+        Branch targetBranch = franchise.getBranches().stream()
+                .filter(branch -> branch.getId().equals(branchId))
+                .findFirst()
+                .orElse(null);
+
+        if (targetBranch == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        targetBranch.getProducts().add(newProduct);
+
+        Franchise updatedFranchise = franchiseRepository.save(franchise);
+
+        return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<Object> deleteProductToBranch(String franchiseId, String branchId, String productId) {
+
+        Optional<Franchise> franchiseOptional = franchiseRepository.findById(franchiseId);
+        if (franchiseOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Franchise franchise = franchiseOptional.get();
+
+        Branch targetBranch = franchise.getBranches().stream()
+                .filter(branch -> branch.getId().equals(branchId))
+                .findFirst()
+                .orElse(null);
+
+        if (targetBranch == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        boolean productRemoved = targetBranch.getProducts().removeIf(product -> product.getId().equals(productId));
+
+        if (!productRemoved) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Franchise updatedFranchise = franchiseRepository.save(franchise);
+        return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
     }
 }
