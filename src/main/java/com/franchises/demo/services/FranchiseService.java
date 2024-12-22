@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Optional;
 
@@ -108,6 +109,44 @@ public class FranchiseService {
         }
 
         Franchise updatedFranchise = franchiseRepository.save(franchise);
+        return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
+    }
+
+    public ResponseEntity<Object> updateStok(String franchiseId, String branchId, String productId, Map<String, Integer> stockUpdate) {
+
+        Optional<Franchise> franchiseOptional = franchiseRepository.findById(franchiseId);
+        if (franchiseOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Franchise franchise = franchiseOptional.get();
+
+        Branch targetBranch = franchise.getBranches().stream()
+                .filter(branch -> branch.getId().equals(branchId))
+                .findFirst()
+                .orElse(null);
+
+        if (targetBranch == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Product targetProduct = targetBranch.getProducts().stream()
+                .filter(product -> product.getId().equals(productId))
+                .findFirst()
+                .orElse(null);
+
+        if (targetProduct == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        Integer newStock = stockUpdate.get("stock");
+        if (newStock == null || newStock < 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        targetProduct.setStock(newStock);
+        Franchise updatedFranchise = franchiseRepository.save(franchise);
+
         return new ResponseEntity<>(updatedFranchise, HttpStatus.OK);
     }
 }

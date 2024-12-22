@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api")
@@ -38,6 +40,12 @@ public class FranchiseController {
     @DeleteMapping("/{franchiseId}/branches/{branchId}/product/{productId}")
     public ResponseEntity<Object> deleteProductToBranch(@PathVariable String franchiseId, @PathVariable String branchId, @PathVariable String productId) {
         return franchiseService.deleteProductToBranch(franchiseId, branchId, productId);
+    }
+
+    @PutMapping("/{franchiseId}/branches/{branchId}/products/{productId}/stock")
+    public ResponseEntity<Object> updateProductStock(@PathVariable String franchiseId, @PathVariable String branchId, @PathVariable String productId, @RequestBody Map<String, Integer> stockUpdate) {
+        return franchiseService.updateStok(franchiseId, branchId, productId, stockUpdate);
+
     }
 
 }
